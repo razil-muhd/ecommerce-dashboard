@@ -45,7 +45,7 @@ console.log("rgrdtrfyg",data)
   
   return (
     <>
-      <Breadcrumb pageName="Category" />
+      <Breadcrumb pageName="Add Category" innerpage="category" tablelink="/admin/category" />
 
       <form onSubmit={handleSubmit(submitdata)} >
           <div className=" gap-9 sm:grid-cols-2">

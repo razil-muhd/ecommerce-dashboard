@@ -27,7 +27,7 @@ const ACCEPTED_IMAGE_TYPES = [
        
    })
 
-const Categoryaddform = () => {
+const Brandsaddform = () => {
     const {
         register,
         handleSubmit,
@@ -45,7 +45,7 @@ console.log("rgrdtrfyg",data)
   
   return (
     <>
-      <Breadcrumb pageName="Add Category" innerpage="category" tablelink="/admin/category"/>
+      <Breadcrumb pageName="Add Brands"  innerpage="Brands" tablelink="/admin/brands"/>
 
       <form onSubmit={handleSubmit(submitdata)} >
           <div className=" gap-9 sm:grid-cols-2">
@@ -60,7 +60,7 @@ console.log("rgrdtrfyg",data)
                 <div className="flex flex-col gap-5.5 p-6.5">
                   <div>
                     <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
-                     Category Name
+                     Brands Name
                     </label>
                     <input
                       type="text"
@@ -71,7 +71,7 @@ console.log("rgrdtrfyg",data)
                   </div>
                   <div>
                       <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
-                        Category Image
+                        brands Image
                       </label>
                       <DropzoneWrapper>
                         <Typography variant="h6" sx={{ mb: 2.5 }}>
@@ -205,4 +205,4 @@ console.log("rgrdtrfyg",data)
   );
 };
 
-export default Categoryaddform;
+export default Brandsaddform;
