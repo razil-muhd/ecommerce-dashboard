@@ -36,7 +36,7 @@ const logout=()=>{
         </span>
 
         <span className="flex items-center gap-2 font-medium text-dark dark:text-dark-6">
-          <span className="hidden lg:block">Jhon Smith</span>
+          <span className="hidden lg:block">Razil Muhammed</span>
 
           <svg
             className={`fill-current duration-200 ease-in ${dropdownOpen && "rotate-180"}`}
@@ -80,10 +80,10 @@ const logout=()=>{
 
             <span className="block">
               <span className="block font-medium text-dark dark:text-white">
-                Jhon Smith
+              Razil Muhammed
               </span>
               <span className="block font-medium text-dark-5 dark:text-dark-6">
-                jonson@nextadmin.com
+               raazilmuhd@gmail.com
               </span>
             </span>
           </div>

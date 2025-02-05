@@ -6,6 +6,9 @@ import {Controller, useForm} from "react-hook-form";
 import DropzoneWrapper from "../styles/react-drop-zone";
 import{zodResolver} from "@hookform/resolvers/zod";
 import z from "zod";
+import { useRouter } from "next/navigation";
+import { BrandApi } from "@/api/BrandApi";
+import toast from "react-hot-toast";
 
 const MAX_FILE_SIZE = 5000000;
 const ACCEPTED_IMAGE_TYPES = [
@@ -16,32 +19,65 @@ const ACCEPTED_IMAGE_TYPES = [
 ];
 
    const Schema = z.object({
-    category : z.string().nonempty({message:"*Required"}),
-    image:z
-    .any()
-    .refine((file) => file?.size <= MAX_FILE_SIZE, `Max image size is 5MB.`)
-    .refine(
-      (file) => ACCEPTED_IMAGE_TYPES.includes(file?.type),
-      "Only .jpg, .jpeg, .png and .webp formats are supported.",
+    brands : z.string().nonempty({message:"*Required"}),
+   image: z.any().refine(
+      (value) => {
+        const acceptedTypes = ACCEPTED_IMAGE_TYPES;
+  
+        if (typeof value === "string") {
+          return true;
+        } else if (typeof value === "object") {
+          const isTypeAccepted = acceptedTypes.includes(value?.type);
+  
+          return isTypeAccepted;
+        }
+  
+        return false;
+      },
+      {
+        message: "Invalid image format",
+      },
     ),
        
    })
+   type props = {
+    brands: any;
+    brandId: string;
+  };
 
-const Brandeditform = () => {
+const Brandeditform = ({ brands, brandId }: props) => {
+  console.log('heyyyyy',brands)
     const {
         register,
         handleSubmit,
         control,
         reset,
         formState : {errors,},
-    } = useForm<TSchema>({resolver :zodResolver(Schema)});
+    } = useForm<TSchema>({resolver :zodResolver(Schema),
+      defaultValues: {
+        brands: brands.name,
+        image: brands.image,
+      },
+    });
 
 type TSchema = z.infer<typeof Schema>;
 
-const submitdata = async (data:any) =>{
-console.log("rgrdtrfyg",data)
-}
+const router = useRouter();
 
+const submitdata = async (data: any) => {
+  try {
+    console.log(data)
+    const response:any = await BrandApi.updateBrands(data, brandId);
+    if (response.data.success) {
+      toast.success(response.data.message);
+      router.push("/admin/brands");
+      router.refresh();
+    }
+  } catch (errors: any) {
+    toast.error(errors.response.data.message);
+   
+  }
+};
   
   return (
     <>
@@ -65,7 +101,7 @@ console.log("rgrdtrfyg",data)
                     <input
                       type="text"
                       placeholder="Category "
-                      {...register("category")}
+                      {...register("brands")}
                       className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-gray-2 dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:focus:border-primary"
                     />
                   </div>
