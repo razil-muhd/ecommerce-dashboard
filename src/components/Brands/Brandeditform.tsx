@@ -46,7 +46,7 @@ const ACCEPTED_IMAGE_TYPES = [
   };
 
 const Brandeditform = ({ brands, brandId }: props) => {
-  console.log('heyyyyy',brands)
+
     const {
         register,
         handleSubmit,

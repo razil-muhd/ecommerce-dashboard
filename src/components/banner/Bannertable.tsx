@@ -1,9 +1,33 @@
+'use client'
+import { BannerApi } from "@/api/BannerApi";
 import { Package } from "@/types/package";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 
 
 const Bannertable = ({banners}:any) => {
+  const router =useRouter();
+
+  async function deleteBanner(bannerid:any) {
+   try{
+     const deleteBanner = await BannerApi.deleteBanner(bannerid);
+
+     if(deleteBanner.data.success){
+       toast.success(deleteBanner.data.message);
+ 
+       router.refresh()
+     }
+ 
+   }catch(errors:any){
+  
+     toast.error(errors.response.data.message);
+ 
+ 
+   }
+   
+  }
   return (
     <div className="rounded-[10px] border border-stroke bg-white p-4 shadow-1 dark:border-dark-3 dark:bg-gray-dark dark:shadow-card sm:p-7.5">
       <div className="max-w-full overflow-x-auto">
@@ -49,7 +73,7 @@ const Bannertable = ({banners}:any) => {
                 >
                   <div className="flex items-center justify-end space-x-3.5">
                     <button className="hover:text-primary">
-                      <Link href={`/admin/banners/edit`}>
+                      <Link href={`/admin/banners/edit/${banneritem._id}`}>
                     <svg
                           xmlns="http://www.w3.org/2000/svg"
                           width="20"
@@ -69,7 +93,7 @@ const Bannertable = ({banners}:any) => {
                         </svg>
                         </Link>
                     </button>
-                    <button className="hover:text-primary">
+                    <button className="hover:text-primary "onClick={()=>deleteBanner(banneritem._id)}>
                       <svg
                         className="fill-current"
                         width="20"

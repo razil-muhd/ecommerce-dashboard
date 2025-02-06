@@ -6,6 +6,9 @@ import {Controller, useForm} from "react-hook-form";
 import DropzoneWrapper from "../styles/react-drop-zone";
 import{zodResolver} from "@hookform/resolvers/zod";
 import z from "zod";
+import { useRouter } from "next/navigation";
+import { ProductApi } from "@/api/ProductsApi";
+import toast from "react-hot-toast";
 
 const MAX_FILE_SIZE = 5000000;
 const ACCEPTED_IMAGE_TYPES = [
@@ -16,7 +19,7 @@ const ACCEPTED_IMAGE_TYPES = [
 ];
 
    const Schema = z.object({
-    category : z.string().nonempty({message:"*Required"}),
+    product : z.string().nonempty({message:"*Required"}),
     image:z
     .any()
     .refine((file) => file?.size <= MAX_FILE_SIZE, `Max image size is 5MB.`)
@@ -38,8 +41,26 @@ const Productsaddform = () => {
 
 type TSchema = z.infer<typeof Schema>;
 
+const router = useRouter();
+
 const submitdata = async (data:any) =>{
-console.log("rgrdtrfyg",data)
+  try{
+    const response = await ProductApi.createProduct(data);
+    
+    if(response.data.success){
+      toast.success(response.data.message);
+      router.push("/admin/products")
+      router.refresh();
+    }
+
+  }catch(errors:any){
+ 
+    toast.error(errors.response.data.message);
+    console.log("jo:",errors)
+
+
+  }
+
 }
 
   
@@ -65,7 +86,7 @@ console.log("rgrdtrfyg",data)
                     <input
                       type="text"
                       placeholder="Category "
-                      {...register("category")}
+                      {...register("product")}
                       className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-gray-2 dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:focus:border-primary"
                     />
                   </div>

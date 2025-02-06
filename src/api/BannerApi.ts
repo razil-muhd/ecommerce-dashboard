@@ -12,19 +12,19 @@ export const BannerApi = {
       return await axiosClient.get("banners/get-all");
       
     },
-//       getoneBrands: async function (id:string) {
-//         return await axiosClient.get(`brands/get-one/${id}`);
+      getoneBanners: async function (id:string) {
+        return await axiosClient.get(`banners/get-one/${id}`);
         
-//       },
-//       updateBrands: async function (body: any,id:string) {
-//         return await axiosClient.put(`brands/update/${id}`, body, {
-//           headers: {
-//             "Content-Type": "multipart/form-data",
-//           }
-//         })
-//     },
-    // deleteBrands: async function (id:string) {
-    //   return await axiosClient.delete(`brands/delete/${id}`);
+      },
+      updateBanners: async function (body: any,id:string) {
+        return await axiosClient.put(`banners/update/${id}`, body, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          }
+        })
+    },
+    deleteBanner: async function (id:string) {
+      return await axiosClient.delete(`banners/delete/${id}`);
       
-    // },
+    },
 }

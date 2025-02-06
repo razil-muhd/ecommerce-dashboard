@@ -10,8 +10,10 @@ async function getAllBanners() {
 const BannerTables = async () => {
   const banners = await getAllBanners();
   const bannerData = banners.data;
+  console.log("hiii:",bannerData)
 
   return (
+    
     <div>
       <DefaultLayout>
   
