@@ -1,11 +1,14 @@
 import { BrandApi } from '@/api/BrandApi';
 import Brandstables from '@/components/Brands/Brandstable'
 import DefaultLayout from '@/components/Layouts/DefaultLaout'
+import { cookies } from 'next/headers';
 
 import React from 'react'
 async function getAllBrands() {
-  const response: any = await BrandApi.getAllBrands();
-  return response.data;
+      const serverCookies = cookies();
+        const accessToken=serverCookies.get("accessToken")?.value;
+        const response: any = await BrandApi.getAllBrands(accessToken);
+      return response.data;
 }
 
 const BrandsTables = async () => {

@@ -41,6 +41,8 @@ const FileUploaderSingle = (props: Props) => {
     }
   }, [props.file]);
 
+  console.log('filee::',props.file)
+
   return (
     <Box
       {...getRootProps({ className: "dropzone" })}

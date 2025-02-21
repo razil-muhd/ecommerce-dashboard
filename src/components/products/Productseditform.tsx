@@ -6,6 +6,11 @@ import {Controller, useForm} from "react-hook-form";
 import DropzoneWrapper from "../styles/react-drop-zone";
 import{zodResolver} from "@hookform/resolvers/zod";
 import z from "zod";
+import SelectOne from "../Dropdowns/SelectOne";
+import Selectbrand from "../Dropdowns/SelectBrand";
+import { useRouter } from "next/navigation";
+import { ProductApi } from "@/api/ProductsApi";
+import toast from "react-hot-toast";
 
 const MAX_FILE_SIZE = 5000000;
 const ACCEPTED_IMAGE_TYPES = [
@@ -16,31 +21,80 @@ const ACCEPTED_IMAGE_TYPES = [
 ];
 
    const Schema = z.object({
-    category : z.string().nonempty({message:"*Required"}),
-    image:z
-    .any()
-    .refine((file) => file?.size <= MAX_FILE_SIZE, `Max image size is 5MB.`)
-    .refine(
-      (file) => ACCEPTED_IMAGE_TYPES.includes(file?.type),
-      "Only .jpg, .jpeg, .png and .webp formats are supported.",
-    ),
+     product : z.string().nonempty({message:"*Required"}),
+     category : z.string().nonempty({message:"*Required"}),
+     brand : z.string().nonempty({message:"*Required"}),
+     productdescription : z.string().nonempty({message:"*Required"}),
+     productprice : z.string().nonempty({message:"*Required"}),
+     image: z.any().refine(
+              (value) => {
+                const acceptedTypes = ACCEPTED_IMAGE_TYPES;
+          
+                if (typeof value === "string") {
+                  return true;
+                } else if (typeof value === "object") {
+                  const isTypeAccepted = acceptedTypes.includes(value?.type);
+          
+                  return isTypeAccepted;
+                }
+          
+                return false;
+              },
+              {
+                message: "Invalid image format",
+              },
+            ),
        
    })
+   type props={
+    products:any,
+    categories:any,
+    brands:any,
+    productid:string
 
-const Productseditform = () => {
+   }
+ 
+
+const Productseditform = ({products,categories,brands,productid}:props) => {
+  
+  console.log("products",products)
     const {
         register,
         handleSubmit,
         control,
         reset,
         formState : {errors,},
-    } = useForm<TSchema>({resolver :zodResolver(Schema)});
+    } = useForm<TSchema>({resolver :zodResolver(Schema),
+      defaultValues: {
+        product: products.name,
+        image: products.image,
+        category:products.category,
+        productdescription:products.description,
+        productprice:products.price,
+        brand:products.brand
+      },
+    });
 
 type TSchema = z.infer<typeof Schema>;
+const router = useRouter();
 
-const submitdata = async (data:any) =>{
-console.log("rgrdtrfyg",data)
-}
+const submitdata = async (data: any) => {
+  try {
+   
+    const response:any = await ProductApi.updateproducts(data, productid);
+    if (response.data.success) {
+      toast.success(response.data.message);
+      router.push("/admin/products");
+      router.refresh();
+    }
+  } catch (errors: any) {
+    toast.error(errors.response.data.message);
+   
+  }
+};
+
+
+
 
   
   return (
@@ -64,11 +118,51 @@ console.log("rgrdtrfyg",data)
                     </label>
                     <input
                       type="text"
-                      placeholder="Category "
-                      {...register("category")}
+                      placeholder="Products "
+                      {...register("product")}
                       className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-gray-2 dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:focus:border-primary"
                     />
                   </div>
+                  <div>
+                  <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
+                    Product description
+                  </label>
+                  <textarea
+                   
+                    placeholder="Category "
+                    {...register("productdescription")}
+                    className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-gray-2 dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:focus:border-primary"
+                  />
+                </div>
+                <div>
+                  <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
+                    Product price
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Category "
+                    {...register("productprice")}
+                    className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5.5 py-3 text-dark outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-gray-2 dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:focus:border-primary"
+                  />
+                </div>
+                <div>
+             
+             <SelectOne
+               register={register("category")}
+               name="Category"
+               placeHolder="Category"
+               data={categories}
+             />
+           </div>
+           <div>
+             
+             <Selectbrand
+               register={register("brand")}
+               name="Brands"
+               placeHolder="Brands"
+               data={brands}
+             />
+           </div>
                   <div>
                       <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
                         Product Image
@@ -107,95 +201,18 @@ console.log("rgrdtrfyg",data)
                             <button type="reset" onClick={()=>reset()}>Reset</button>
                          </div>
                       </DropzoneWrapper>
-                      {/* <input
-                        type="text"
-                        placeholder="Active Input"
-                        className="w-full rounded-[7px] border-[1.5px] border-primary bg-transparent px-5 py-3 text-dark outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-gray-2 dark:bg-dark-2 dark:text-white"
-                      /> */}
+                    
                     </div>
     
-                  {/* <div>
-                    <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
-                      Active Input
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="Active Input"
-                      className="w-full rounded-[7px] border-[1.5px] border-primary bg-transparent px-5 py-3 text-dark outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-gray-2 dark:bg-dark-2 dark:text-white"
-                    />
-                  </div> */}
-    
-                  {/* <div>
-                    <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
-                      Disabled label
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="Disabled label"
-                      disabled
-                      className="w-full rounded-[7px] border-[1.5px] border-stroke bg-transparent px-5 py-3 text-dark outline-none transition focus:border-primary active:border-primary disabled:cursor-default disabled:bg-gray-2 dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:focus:border-primary dark:disabled:bg-dark"
-                    />
-                  </div> */}
+            
                 </div>
               </div>
     
-              {/* <!-- Toggle switch input --> */}
-              {/* <div className="rounded-[10px] border border-stroke bg-white shadow-1 dark:border-dark-3 dark:bg-gray-dark dark:shadow-card">
-                <div className="border-b border-stroke px-6.5 py-4 dark:border-dark-3">
-                  <h3 className="font-medium text-dark dark:text-white">
-                    Toggle switch input
-                  </h3>
-                </div>
-                <div className="flex flex-col gap-5.5 p-6.5">
-                  <SwitcherOne />
-                  <SwitcherTwo />
-                  <SwitcherThree />
-                  <SwitcherFour />
-                </div>
-              </div> */}
+          
     
-              {/* <!-- Time and date --> */}
-              {/* <div className="rounded-[10px] border border-stroke bg-white shadow-1 dark:border-dark-3 dark:bg-gray-dark dark:shadow-card">
-                <div className="border-b border-stroke px-6.5 py-4 dark:border-dark-3">
-                  <h3 className="font-medium text-dark dark:text-white">
-                    Time and date
-                  </h3>
-                </div>
-                <div className="flex flex-col gap-5.5 p-6.5">
-                  <DatePickerOne />
-                  <DatePickerTwo />
-                </div>
-              </div> */}
+            
     
-              {/* <!-- File upload --> */}
-              {/* <div className="rounded-[10px] border border-stroke bg-white shadow-1 dark:border-dark-3 dark:bg-gray-dark dark:shadow-card">
-                <div className="border-b border-stroke px-6.5 py-4 dark:border-dark-3">
-                  <h3 className="font-medium text-dark dark:text-white">
-                    File upload
-                  </h3>
-                </div>
-                <div className="flex flex-col gap-5.5 p-6.5">
-                  <div>
-                    <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
-                      Attach file
-                    </label>
-                    <input
-                      type="file"
-                      className="w-full cursor-pointer rounded-[7px] border-[1.5px] border-stroke bg-transparent outline-none transition file:mr-5 file:border-collapse file:cursor-pointer file:border-0 file:border-r file:border-solid file:border-stroke file:bg-[#E2E8F0] file:px-6.5 file:py-[13px] file:text-body-sm file:font-medium file:text-dark-5 file:hover:bg-primary file:hover:bg-opacity-10 focus:border-primary active:border-primary disabled:cursor-default disabled:bg-dark dark:border-dark-3 dark:bg-dark-2 dark:file:border-dark-3 dark:file:bg-white/30 dark:file:text-white dark:focus:border-primary"
-                    />
-                  </div>
-    
-                  <div>
-                    <label className="mb-3 block text-body-sm font-medium text-dark dark:text-white">
-                      Attach file
-                    </label>
-                    <input
-                      type="file"
-                      className="w-full cursor-pointer rounded-[7px] border-[1.5px] border-stroke px-3 py-[9px] outline-none transition file:mr-4 file:rounded file:border-[0.5px] file:border-stroke file:bg-stroke file:px-2.5 file:py-1 file:text-body-xs file:font-medium file:text-dark-5 focus:border-primary file:focus:border-primary active:border-primary disabled:cursor-default disabled:bg-dark dark:border-dark-3 dark:bg-dark-2 dark:file:border-dark-3 dark:file:bg-white/30 dark:file:text-white"
-                    />
-                  </div>
-                </div>
-              </div> */}
+             
             </div>
     
     

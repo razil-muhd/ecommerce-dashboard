@@ -1,35 +1,39 @@
+"use client";
+import { ProductApi } from "@/api/ProductsApi";
 import { Package } from "@/types/package";
 import Link from "next/link";
-
-const productdata: Package[] = [
-  {
-    name: "Free package",
-    price: 0.0,
-    invoiceDate: `Jan 13,2023`,
-    status: "Paid",
-  },
-  {
-    name: "Standard Package",
-    price: 59.0,
-    invoiceDate: `Jan 13,2023`,
-    status: "Paid",
-  },
-  {
-    name: "Business Package",
-    price: 99.0,
-    invoiceDate: `Jan 13,2023`,
-    status: "Unpaid",
-  },
-  {
-    name: "Standard Package",
-    price: 59.0,
-    invoiceDate: `Jan 13,2023`,
-    status: "Pending",
-  },
-];
+import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 const Productstable = ({ productdata }: any) => {
-  console.log("object:", productdata);
+  const router = useRouter();
+
+  async function deleteProducts(productid: any) {
+    try {
+      const deleteProducts = await ProductApi.deleteProducts(productid);
+
+      if (deleteProducts.data.success) {
+        toast.success(deleteProducts.data.message);
+
+        router.refresh();
+      }
+    } catch (errors: any) {
+      toast.error(errors.response.data.message);
+    }
+  }
+  async function featuredProduct(productid: any) {
+    try {
+      const featuredProduct = await ProductApi.featuredProduct(productid);
+
+      if (featuredProduct.data.success) {
+        toast.success(featuredProduct.data.message);
+
+        router.refresh();
+      }
+    } catch (errors: any) {
+      toast.error(errors.response.data.message);
+    }
+  }
   return (
     <div className="rounded-[10px] border border-stroke bg-white p-4 shadow-1 dark:border-dark-3 dark:bg-gray-dark dark:shadow-card sm:p-7.5">
       <div className="max-w-full overflow-x-auto">
@@ -56,6 +60,9 @@ const Productstable = ({ productdata }: any) => {
                 brand
               </th>
               <th className="min-w-[220px] px-4 py-4 font-medium text-dark dark:text-white xl:pl-7.5">
+                featured
+              </th>
+              <th className="min-w-[220px] px-4 py-4 font-medium text-dark dark:text-white xl:pl-7.5">
                 Actions
               </th>
             </tr>
@@ -69,39 +76,53 @@ const Productstable = ({ productdata }: any) => {
                   <h5 className="text-dark dark:text-white">
                     {productitem.product}
                   </h5>
-                 
                 </td>
-                <td
-                  className={`border-[#eee] px-4 py-4 dark:border-dark-3`}
-                >
+                <td className={`border-[#eee] px-4 py-4 dark:border-dark-3`}>
                   <p className="text-dark dark:text-white">
                     {productitem.price}
                   </p>
                 </td>
-                <td
-                  className={`border-[#eee] px-4 py-4 dark:border-dark-3`}
-                >
+                <td className={`border-[#eee] px-4 py-4 dark:border-dark-3`}>
                   <p
                     className={`inline-flex rounded-full px-3.5 py-1 text-body-sm font-medium `}
                   >
                     {productitem.category}
                   </p>
                 </td>
-                <td
-                  className={`border-[#eee] px-4 py-4 dark:border-dark-3 `}
-                >
+                <td className={`border-[#eee] px-4 py-4 dark:border-dark-3 `}>
                   <p
                     className={`inline-flex rounded-full px-3.5 py-1 text-body-sm font-medium`}
                   >
                     {productitem.brand}
                   </p>
                 </td>
+                <td className={`border-[#eee] px-4 py-4 dark:border-dark-3`}>
+                  <label className="flex cursor-pointer select-none items-center">
+                    <div className="relative">
+                      <input
+                        type="checkbox"
+                        className="sr-only"
+                        onChange={async () => {
+                          await featuredProduct(productitem._id);
+                        }}
+                      />
+                      <div className="block h-8 w-14 rounded-full bg-gray-3 dark:bg-[#5A616B]"></div>
+                      <div
+                        className={`absolute left-1 top-1 h-6 w-6 rounded-full bg-white shadow-switch-1 transition ${
+                          productitem.featured &&
+                          "!right-1 !translate-x-full !bg-primary dark:!bg-white"
+                        }`}
+                      ></div>
+                    </div>
+                  </label>
+                </td>
+
                 <td
                   className={`border-[#eee] px-4 py-4 dark:border-dark-3 xl:pr-7.5 `}
                 >
                   <div className="flex items-center  space-x-3.5">
                     <button className="hover:text-primary">
-                      <Link href={`/admin/products/edit`}>
+                      <Link href={`/admin/products/edit/${productitem._id}`}>
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
                           width="20"
@@ -121,7 +142,10 @@ const Productstable = ({ productdata }: any) => {
                         </svg>
                       </Link>
                     </button>
-                    <button className="hover:text-primary">
+                    <button
+                      className="hover:text-red-800"
+                      onClick={() => deleteProducts(productitem._id)}
+                    >
                       <svg
                         className="fill-current"
                         width="20"
@@ -150,7 +174,6 @@ const Productstable = ({ productdata }: any) => {
                         />
                       </svg>
                     </button>
-                   
                   </div>
                 </td>
               </tr>

@@ -2,10 +2,13 @@ import { BrandApi } from '@/api/BrandApi';
 import Brandeditform from '@/components/Brands/Brandeditform';
 
 import DefaultLayout from '@/components/Layouts/DefaultLaout'
+import { cookies } from 'next/headers';
 import React from 'react'
 
 async function getoneBrands(id: string) {
-  const response: any = await BrandApi.getoneBrands(id);
+     const serverCookies = cookies();
+     const accessToken=serverCookies.get("accessToken")?.value;
+  const response: any = await BrandApi.getoneBrands(id,accessToken);
   return response.data;
 }
 

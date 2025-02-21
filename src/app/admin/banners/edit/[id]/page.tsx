@@ -2,11 +2,15 @@ import { BannerApi } from "@/api/BannerApi";
 import { CategoryApi } from "@/api/CategoryApi";
 import Bannereditform from "@/components/banner/Bannereditform";
 import DefaultLayout from "@/components/Layouts/DefaultLaout";
+import { cookies } from "next/headers";
 import React from "react";
 
 async function getAllCategory (id: string) {
-  const response1: any = await BannerApi.getoneBanners(id);
-  const response2: any = await CategoryApi.getAllCategory();
+   const serverCookies = cookies();
+      const accessToken=serverCookies.get("accessToken")?.value;
+
+  const response1: any = await BannerApi.getoneBanners(id,accessToken);
+  const response2: any = await CategoryApi.getAllCategory(accessToken);
   return{response:response1.data,response1:response2.data}
   
 }

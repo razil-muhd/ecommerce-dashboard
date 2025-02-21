@@ -1,6 +1,7 @@
+import { baseUrl } from "@/utils/baseurl";
 import axios  from "axios";
 export const axiosClient = axios.create({
-    baseURL:"http://localhost:5050/dashboard/api/",
+    baseURL: baseUrl,
 
 });
 export default axiosClient;

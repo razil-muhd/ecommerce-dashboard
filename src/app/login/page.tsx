@@ -5,12 +5,12 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import z from "zod";
 import { useRouter } from "next/navigation";
+import { AuthApi } from "@/api/AuthApi";
+import toast from "react-hot-toast";
+import Cookies from "js-cookie";
  const Schema = z.object({
   email: z.string().email("Email is required"),
-  password: z.string().min(8, "Password is required atleast 8 character").max(10,"maximum 10 character") .regex(
-    /^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*(),.?":{}|<>]).(?=.*[0-9]).*$/,
-    "Password must include at least one uppercase letter, one lowercase letter,one number, and one special character",
-  )
+  password: z.string().min(5, "Password is required atleast 5 character").max(10,"maximum 10 character")
       
     
    })
@@ -29,8 +29,25 @@ export default function SigninWithPassword() {
   });
   const router = useRouter();
   const onsubmit = async (data: TSchema) => {
-    router.push("/")
-    console.log("submitted data:", data);
+    try{
+      const login = await AuthApi.login(data)
+      console.log("login:",login);
+    
+        if(login.data.success){
+          window.localStorage.setItem("accesstoken", login.data.accessToken)
+          window.localStorage.setItem("userData",JSON.stringify (login.data.userData))
+          Cookies.set("accessToken",login.data.accessToken)
+          toast.success('login succesfull');
+          router.push("/admin/category")
+          router.refresh()
+        }
+     }catch(errors:any){
+      console.log("object",errors)
+   
+      toast.error(errors.response.data);
+  
+  
+    }
     reset()
   };
 
